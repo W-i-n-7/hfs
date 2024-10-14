@@ -279,7 +279,10 @@ export async function waitFor<T>(cb: ()=> Promisable<T>, { interval=200, timeout
     }
 }
 
-export function getOrSet<T>(o: Record<string,T>, k:string, creator:()=>T): T {
+export function getOrSet<T>(o: Record<string,T> | Map<string, T>, k:string, creator:()=>T): T {
+    if (o instanceof Map)
+        return o.get(k)
+            || with_(creator(), x => o.set(k, x) && x)
     return k in o ? o[k]!
         : (o[k] = creator())
 }
